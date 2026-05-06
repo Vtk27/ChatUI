@@ -150,6 +150,7 @@ function JoinPage() {
     }
   }
 
+  
   return (
     <div className="min-h-screen">
       <header className="bg-slate-950">
