@@ -151,13 +151,26 @@ function JoinPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <div className="min-h-screen">
+      <header className="bg-slate-950">
+        <div className="mx-auto flex h-14 w-full max-w-5xl items-center px-4">
+          <h1 className="text-base font-semibold tracking-wide text-white">Chat System</h1>
+        </div>
+      </header>
+
+      <main className="flex justify-center px-4 py-8">
+        <div className="w-full max-w-md space-y-4">
+          <header className="space-y-1 text-center">
+            <p className="text-sm text-slate-600">Share chat ID to connect</p>
+            <p className="text-sm text-slate-500">Chat instantly, no signup required</p>
+          </header>
+
+          <div className="w-full rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
         <div className="space-y-2">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-400">
             Chat System
           </p>
-          <h1 className="text-3xl font-semibold text-slate-900">Join a chat</h1>
+          <h2 className="text-3xl font-semibold text-slate-900">Join a chat</h2>
           <p className="text-sm text-slate-500">
             Create a new room or join with an existing chat ID.
           </p>
@@ -234,7 +247,29 @@ function JoinPage() {
           </div>
           {errorMessage ? (<ErrorScreen errorMessage={errorMessage} dismissError={dismissError} />) : null}
         </div>
-      </div>
+          </div>
+
+          <footer className="text-center">
+            <a
+              href="https://github.com/Vtk27/ChatService"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-slate-500 transition hover:text-slate-800"
+            >
+              View Source on GitHub
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-3.5 w-3.5"
+                aria-hidden="true"
+              >
+                <path d="M12 2C6.48 2 2 6.58 2 12.23c0 4.52 2.87 8.35 6.84 9.71.5.1.66-.22.66-.49 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.21-3.37-1.21-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.9 1.58 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.08 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.31.1-2.72 0 0 .84-.28 2.75 1.05A9.3 9.3 0 0 1 12 6.9c.85 0 1.71.12 2.51.35 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.95-2.34 4.81-4.57 5.07.36.32.68.95.68 1.92 0 1.38-.01 2.5-.01 2.84 0 .27.17.59.67.49A10.24 10.24 0 0 0 22 12.23C22 6.58 17.52 2 12 2Z" />
+              </svg>
+            </a>
+          </footer>
+        </div>
+      </main>
     </div>
   )
 }
