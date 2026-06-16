@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom"
+import { Analytics } from "@vercel/analytics/react"
 import JoinPage from "./pages/JoinPage"
 import ChatPage from "./pages/ChatPage"
 
@@ -10,6 +11,7 @@ function App() {
         <Route path="/chat/:chatId" element={<ChatPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Analytics />
     </div>
   )
 }
