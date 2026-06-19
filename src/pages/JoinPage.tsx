@@ -22,7 +22,7 @@ function JoinPage() {
   const [isCreating, setIsCreating] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
   const [isBackendReady, setIsBackendReady] = useState(false)
-  const [showBackendNotice, setShowBackendNotice] = useState(true)
+  const [showBackendNotice, setShowBackendNotice] = useState(false)
   const [userIdError, setUserIdError] = useState("")
   const [chatIdError, setChatIdError] = useState("")
   const dismissError = () => setErrorMessage("")
@@ -64,6 +64,7 @@ function JoinPage() {
     } catch (error) {
       console.warn("Backend health check failed:", error)
       setIsBackendReady(false)
+      setShowBackendNotice(true)
       return false
     } finally {
       window.clearTimeout(timeoutId)
