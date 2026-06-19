@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { errorMessages } from "../Components/errorMessages"
 import  ErrorScreen  from "../Components/ErrorScreen"
@@ -14,17 +14,73 @@ declare global {
 }
 
 function JoinPage() {
+  const backendWakeUpMessage =
+    "Backend is hosted on Render. It may take 60-90 seconds to serve the first request after inactivity."
   const navigate = useNavigate()
   const [chatIdInput, setChatIdInput] = useState("")
   const [userIdInput, setUserIdInput] = useState("")
   const [isCreating, setIsCreating] = useState(false)
   const [isJoining, setIsJoining] = useState(false)
+  const [isBackendReady, setIsBackendReady] = useState(false)
+  const [showBackendNotice, setShowBackendNotice] = useState(true)
   const [userIdError, setUserIdError] = useState("")
   const [chatIdError, setChatIdError] = useState("")
   const dismissError = () => setErrorMessage("")
   const [errorMessage, setErrorMessage] = useState("")
+  const pollIntervalRef = useRef<number | null>(null)
+  const healthCheckInFlightRef = useRef(false)
 
   const sleep = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
+
+  const stopHealthPolling = () => {
+    if (pollIntervalRef.current !== null) {
+      window.clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+    }
+  }
+
+  const checkBackendHealth = async () => {
+    if (healthCheckInFlightRef.current) {
+      return false
+    }
+
+    healthCheckInFlightRef.current = true
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 5000)
+
+    try {
+      const response = await fetch(apiUrl("/health"), {
+        signal: controller.signal,
+      })
+
+      if (!response.ok) {
+        return false
+      }
+
+      setIsBackendReady(true)
+      setShowBackendNotice(false)
+      stopHealthPolling()
+      return true
+    } catch (error) {
+      console.warn("Backend health check failed:", error)
+      setIsBackendReady(false)
+      return false
+    } finally {
+      window.clearTimeout(timeoutId)
+      healthCheckInFlightRef.current = false
+    }
+  }
+
+  useEffect(() => {
+    void checkBackendHealth()
+    pollIntervalRef.current = window.setInterval(() => {
+      void checkBackendHealth()
+    }, 5000)
+
+    return () => {
+      stopHealthPolling()
+    }
+  }, [])
 
   const parseChatIdResponse = async (response: Response) => {
     const contentType = response.headers.get("content-type") || ""
@@ -93,6 +149,10 @@ function JoinPage() {
       return
     }
     setUserIdError("")
+    if (!isBackendReady) {
+      setShowBackendNotice(true)
+      return
+    }
     setIsCreating(true)
     setErrorMessage("")
 
@@ -130,6 +190,11 @@ function JoinPage() {
     }
 
     if (hasValidationError) {
+      return
+    }
+
+    if (!isBackendReady) {
+      setShowBackendNotice(true)
       return
     }
 
@@ -245,7 +310,18 @@ function JoinPage() {
               {isJoining ? "Joining..." : "Join Chat"}
             </button>
           </div>
-          {errorMessage ? (<ErrorScreen errorMessage={errorMessage} dismissError={dismissError} />) : null}
+          {errorMessage ? (
+            <ErrorScreen errorMessage={errorMessage} dismissError={dismissError} />
+          ) : null}
+          {!errorMessage && showBackendNotice && !isBackendReady ? (
+            <ErrorScreen
+              errorMessage={backendWakeUpMessage}
+              dismissError={() => setShowBackendNotice(false)}
+              title="Backend warming up"
+              actionLabel="Close"
+              tone="warning"
+            />
+          ) : null}
         </div>
           </div>
 
